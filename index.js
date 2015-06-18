@@ -15,5 +15,8 @@ $$("#examples article").forEach(function (article, i) {
         var fixed = StyleFix.fix(this.value);
         div.setAttribute("style", fixed);
     }).call(textarea);
+
+    new Incrementable(textarea);
+
     article.appendChild(textarea);
 });

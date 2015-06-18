@@ -1,5 +1,7 @@
 /**
  * CSS conic-gradient() polyfill
+ * By Lea Verou — http://lea.verou.me
+ * MIT license
  */
 
 (function(){
@@ -23,7 +25,7 @@ var _ = self.ConicGradient = function(stops, repeating, size) {
 		repeating = false;
 	}
 
-	this.repeating = !!repeating; // TODO implement this
+	this.repeating = !!repeating;
 
 	this.size = size || Math.max(innerWidth, innerHeight);
 
@@ -126,7 +128,8 @@ _.prototype = {
 		return Math.sqrt(2) * this.size / 2;
 	},
 	
-	// Inspired from http://jsdo.it/akm2/yr9B
+	// Paint the conical gradient on the canvas
+	// Algorithm inspired from http://jsdo.it/akm2/yr9B
 	paint: function() {
 		var c = this.context;
 		
@@ -134,28 +137,39 @@ _.prototype = {
 		var x = this.size / 2;
 		
 		var stopIndex = 0; // The index of the current color
-		var stop = this.stops[stopIndex];
-
-		var prevStop = stop;
+		var stop = this.stops[stopIndex], prevStop;
 		
 		var diff, t;
 
-		for (var i = 0; i < 1; i += 1 / 360) {
-			if (i >= stop.pos) {
-				// Switch color stop
-				prevStop = stop;
+		c.translate(this.size/2, this.size/2);
+		c.rotate(-90*deg);
+		c.translate(-this.size/2, -this.size/2);
 
-				stopIndex++;
-				stop = this.stops[stopIndex];
-				
+		for (var i = 0; i < 360; i+=.5) {
+			if (i/360 >= stop.pos) {
+				// Switch color stop
+				do {
+					prevStop = stop;
+
+					stopIndex++;
+					stop = this.stops[stopIndex];
+				} while(stop != prevStop && stop.pos === prevStop.pos);
+
+				if (!stop) {
+					break;
+				}
+
+				var sameColor = prevStop.color + "" === stop.color + "";
+
 				diff = prevStop.color.map(function(c, i){
 					return stop.color[i] - c;
 				});
+
 			}
 			
-			t = (i - prevStop.pos) / (stop.pos - prevStop.pos);
+			t = (i/360 - prevStop.pos) / (stop.pos - prevStop.pos);
 
-			var interpolated = diff.map(function(d,i){
+			var interpolated = sameColor? stop.color : diff.map(function(d,i){
 				var ret = d * t + prevStop.color[i];
 
 				return i < 3? ret & 255 : ret;
@@ -165,15 +179,30 @@ _.prototype = {
 			c.fillStyle = 'rgba(' + interpolated.join(",") + ')';
 			c.beginPath();
 			c.moveTo(x, x);
-			// 0.02: Little start from the front the startAngle so that moire is not out
+			
+			var angle = Math.min(360*deg, i*deg);
 
-			var angle = 2*π * (-1/4 + i);
+			if (sameColor) {
+				var θ = 360 * (stop.pos - prevStop.pos);
 
-			c.arc(x, x, radius, angle - 0.02, angle + deg); 
+				i += θ - .5;
+			}
+			else {
+				var θ = .5;
+			}
+			
+			var endAngle = angle + θ*deg;
+
+			endAngle = Math.min(360*deg, endAngle);
+
+			// 0.02: To prevent moire
+			
+			var arc = endAngle - angle;
+			c.arc(x, x, radius, arc >= 90*deg? angle : angle - 0.02, endAngle); 
+
 			c.closePath();
 			c.fill();
-
-			
+		
 		}
 	}
 };
@@ -246,13 +275,13 @@ if (self.StyleFix) {
 		var dummy = document.createElement("p");
 		dummy.style.backgroundImage = "conic-gradient(white, black)";
 		dummy.style.backgroundImage = PrefixFree.prefix + "conic-gradient(white, black)";
-console.log(dummy.style.backgroundImage);
+
 		if (!dummy.style.backgroundImage) {
 			// Not supported, use polyfill
 			StyleFix.register(function(css, raw) {
 				if (css.indexOf("conic-gradient") > -1) {
 					css = css.replace(/(?:repeating-)?conic-gradient\(((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
-						return new ConicGradient(stops, gradient.indexOf("repeating-") > -1);
+						return new ConicGradient(stops, gradient.indexOf("repeating-") > -1, 400);
 					});
 				}
 
