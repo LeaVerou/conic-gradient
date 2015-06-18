@@ -4,6 +4,10 @@
 
 (function(){
 
+var π = Math.PI;
+var τ = 2 * π;
+var deg = π/180;
+
 var dummy = document.createElement("div");
 document.head.appendChild(dummy);
 
@@ -90,7 +94,6 @@ var _ = self.ConicGradient = function(stops, repeating, size) {
 				this.stops.push(s);
 			}
 		}
-		console.log(this.stops);
 	}
 
 	this.paint();
@@ -123,96 +126,55 @@ _.prototype = {
 		return Math.sqrt(2) * this.size / 2;
 	},
 	
-	// Original conical gradient code via http://jsdo.it/akm2/yr9B
+	// Inspired from http://jsdo.it/akm2/yr9B
 	paint: function() {
 		var c = this.context;
-
-		var π = Math.PI;
-		var τ = 2 * π;
 		
 		var radius = this.r;
 		var x = this.size / 2;
 		
-		var startAngle = -π/2;
-		var endAngle = 3*π/2;
+		var stopIndex = 0; // The index of the current color
+		var stop = this.stops[stopIndex];
+
+		var prevStop = stop;
 		
-		var currentColorIndex = 0; // The index of the current color
-		var currentColor = this.stops[currentColorIndex].color; // Current color
-		var nextColor    = this.stops[currentColorIndex].color; // Next color
-		
-		var prevOffset = 0; // Before the offset value
-		var currentOffset = this.stops[currentColorIndex].pos; // The current offset value
-		var offsetDist = currentOffset - prevOffset; // The difference between the offset
+		var diff, t;
 
-		var arcStartAngle = startAngle; // Start angle of fill in the loop
-		var arcEndAngle; // Exit angle of fill in the loop
+		for (var i = 0; i < 1; i += 1 / 360) {
+			if (i >= stop.pos) {
+				// Switch color stop
+				prevStop = stop;
 
-		var r1 = currentColor[0],
-			g1 = currentColor[1],
-			b1 = currentColor[2],
-			a1 = currentColor[3];
-
-		var r2 = nextColor[0],
-			g2 = nextColor[1],
-			b2 = nextColor[2],
-			a2 = nextColor[3];
-
-		if (!a1 && a1 !== 0) a1 = 1;
-		if (!a2 && a2 !== 0) a2 = 1;
-		
-		var rd = r2 - r1,
-			gd = g2 - g1,
-			bd = b2 - b1,
-			ad = a2 - a1;
-		var t, r, g, b, a;
-					
-		c.save();
-
-		for (var i = 0, n = 1 / 360; i < 1; i += n) {
-			if (i >= currentOffset) {
-				// To the next color
-				currentColorIndex++;
-
-				currentColor = nextColor;
+				stopIndex++;
+				stop = this.stops[stopIndex];
 				
-				r1 = currentColor[0];
-				g1 = currentColor[1];
-				b1 = currentColor[2];
-				a1 = currentColor[3];
-
-				if (!a1 && a1 !== 0) a1 = 1;
-
-				nextColor = this.stops[currentColorIndex].color;
-				r2 = nextColor[0]; g2 = nextColor[1]; b2 = nextColor[2]; a2 = nextColor[3];
-				if (!a2 && a2 !== 0) a2 = 1;
-				
-				rd = r2 - r1; gd = g2 - g1; bd = b2 - b1; ad = a2 - a1;
-				
-				prevOffset = currentOffset;
-				currentOffset = this.stops[currentColorIndex].pos;
-				offsetDist = currentOffset - prevOffset;
+				diff = prevStop.color.map(function(c, i){
+					return stop.color[i] - c;
+				});
 			}
 			
-			t = (i - prevOffset) / offsetDist;
-			r = (rd * t + r1) & 255;
-			g = (gd * t + g1) & 255;
-			b = (bd * t + b1) & 255;
-			a = ad * t + a1;
+			t = (i - prevStop.pos) / (stop.pos - prevStop.pos);
 
-			arcEndAngle = arcStartAngle + π / 180;
+			var interpolated = diff.map(function(d,i){
+				var ret = d * t + prevStop.color[i];
 
-			// Go painted in a fan shape (?!)
-			c.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+				return i < 3? ret & 255 : ret;
+			});
+
+			// Draw a series of arcs, 1deg each
+			c.fillStyle = 'rgba(' + interpolated.join(",") + ')';
 			c.beginPath();
 			c.moveTo(x, x);
-			c.arc(x, x, radius, arcStartAngle - 0.02, arcEndAngle, false); // Little start from the front the startAngle so that moire is not out
+			// 0.02: Little start from the front the startAngle so that moire is not out
+
+			var angle = 2*π * (-1/4 + i);
+
+			c.arc(x, x, radius, angle - 0.02, angle + deg); 
 			c.closePath();
 			c.fill();
 
-			arcStartAngle += π / 180;
+			
 		}
-
-		c.restore();
 	}
 };
 

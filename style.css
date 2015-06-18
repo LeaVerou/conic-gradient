@@ -4,6 +4,7 @@ body {
     padding: 2em;
     background-color: #fff;
     background: white;
+    font: 100%/1.5 Palatino Linotype, Palatino, serif;
 }
 
 h1 {
@@ -24,6 +25,10 @@ a {
 
 a:not(:hover) {
 	text-decoration: none;
+}
+
+ul, ol {
+	padding-left: 0;
 }
 
 textarea {

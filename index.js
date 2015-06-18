@@ -1,4 +1,8 @@
-[].slice.call(document.querySelectorAll("#examples article")).forEach(function (article, i) {
+function $$(selector) {
+    return Array.prototype.slice.call(document.querySelectorAll(selector));
+}
+
+$$("#examples article").forEach(function (article, i) {
     var style = article.getAttribute("style");
     article.removeAttribute("style");
 
