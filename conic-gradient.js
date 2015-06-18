@@ -13,25 +13,22 @@ var deg = π/180;
 var dummy = document.createElement("div");
 document.head.appendChild(dummy);
 
-var _ = self.ConicGradient = function(stops, repeating, size) {
+var _ = self.ConicGradient = function(o) {
 	var me = this;
 	_.all.push(this);
+
+	o = o || {};
 
 	this.canvas = document.createElement("canvas");
 	this.context = this.canvas.getContext("2d");
 
-	if (typeof repeating === "number") {
-		size = repeating;
-		repeating = false;
-	}
+	this.repeating = !!o.repeating;
 
-	this.repeating = !!repeating;
-
-	this.size = size || Math.max(innerWidth, innerHeight);
+	this.size = o.size || Math.max(innerWidth, innerHeight);
 
 	this.canvas.width = this.canvas.height = this.size;
 
-	var stops = stops;
+	var stops = o.stops;
 
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
@@ -121,7 +118,11 @@ _.prototype = {
 	get svg() {
 		return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">' + 
 			'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">' +
-			'<image width="100" height="100%" xlink:href="' + this.canvas.toDataURL() + '" /></svg></svg>';
+			'<image width="100" height="100%" xlink:href="' + this.png + '" /></svg></svg>';
+	},
+
+	get png() {
+		return this.canvas.toDataURL();
 	},
 
 	get r() {
@@ -281,7 +282,11 @@ if (self.StyleFix) {
 			StyleFix.register(function(css, raw) {
 				if (css.indexOf("conic-gradient") > -1) {
 					css = css.replace(/(?:repeating-)?conic-gradient\(((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
-						return new ConicGradient(stops, gradient.indexOf("repeating-") > -1, 400);
+						return new ConicGradient({
+							stops: stops, 
+							repeating: gradient.indexOf("repeating-") > -1,
+							size: 400
+						});
 					});
 				}
 

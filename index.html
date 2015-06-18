@@ -9,7 +9,7 @@
 
 <header>
 <h1>CSS conic-gradient() polyfill</h1>
-<p><a href="http://w3.org/TR/css4-images/#conic-gradients">Conic gradients</a> are awesome. However, browsers haven’t realized yet. This polyfill lets you experiment with them, before they are implemented. If you like them, <a href="#ask">ask browser vendors to implement them</a>!</p>
+<p><a href="http://w3.org/TR/css4-images/#conic-gradients">Conic gradients</a> are awesome, but browsers haven’t realized yet. This polyfill lets you experiment with them now. If you like them, <a href="#ask">ask browser vendors to implement them</a>!</p>
 </header>
 
 <section id="examples">
@@ -17,6 +17,8 @@
         <!-- <article style="/* Starburst with repeating gradients */
 background: #0ac
 repeating-conic-gradient(hsla(0,0%,100%,.2) 0 40deg, hsla(0,0%,100%,0) 0 80deg);"></article> -->
+          <article style="/* Basic example */
+background: conic-gradient(#f06, gold);"></article>
      <article style="/* Conical gradient cone */
 background: conic-gradient(#eee .1turn, black, #eee 326deg);"></article>
    <article style="/* Hue wheel */
@@ -70,31 +72,39 @@ repeating-conic-gradient(hsla(0,0%,100%,.2) 0 15deg, hsla(0,0%,100%,0) 0 30deg);
 &lt;script src="<a href="conic-gradient.js">conic-gradient.js</a>">&lt;/script></code></pre>
 
     <p>Alternatively, you can use the API to directly get the SVG element generated and do whatever you want with it:</p>
-    <pre><code class="language-javascript">var gradient = new ConicGradient("gold 40%, #f06 0");
-console.log(gradient.svg);
-console.log(gradient.dataURL);
-console.log(gradient.blobURL);</code></pre>
+    <pre><code class="language-javascript">var gradient = new ConicGradient({
+    stops: "gold 40%, #f06 0", // required
+    repeating: true, // Default: false
+    size: 400 // Default: Math.max(innerWidth, innerHeight)
+});
 
-    <p>Optionally, you can pass in a parameter for size of the bitmap image generated inside the SVG (defaults to <code>Math.max(innerWidth, innerHeight)</code>, i.e. the max of the viewport dimensions):</p>
-    <pre><code class="language-javascript">var gradient = new ConicGradient("gold 40%, #f06 0", 400);</code></pre>
+console.log(gradient.svg); // SVG markup
+console.log(gradient.png); // PNG image (fixed dimensions) as a data URL
+console.log(gradient.dataURL); // data URL
+console.log(gradient.blobURL); // blog URL</code></pre>
+
+    <p>Note that the generated image will always resize accordingly, you don’t have to provide a size. The size argument just controls the resolution of the bitmap image generated inside the SVG that will be scaled. Making it smaller will result in faster performance but less crisp gradients.</p>
 </section>
 
 <section id="ask">
     <h1>How can I get conic gradients implemented?</h1>
 
     <p>The best way to get a feature implemented is asking browser vendors to do it. It’s really that simple. Browser vendors prioritize what to implement based on developer requests, so the more developers asking for a feature, the higher the chances browsers will notice.</p>
-
+    
+    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Conic gradients are awesome. Please implement them @IEDevChat @mozhacks @ChromiumDev @odevrel @webkit" data-via="LeaVerou">Tweet</a>
     <a href="https://twitter.com/share" class="twitter-share-button" data-text="Conic gradients are awesome. Please implement them @IEDevChat @mozhacks @ChromiumDev @odevrel @webkit" data-via="LeaVerou">Tweet</a>
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
     
-    <p>Also, communicate directly with the developers. Vote or comment etc in the following:</p>
+    <p>Also, communicate directly with the developers. Vote or comment in the following:</p>
 
     <ul>
-        <li>Microsoft Edge Uservoice thread (TBD)</li>
-        <li>Gecko bug report (TBD)</li>
+        <li><a href="https://wpdev.uservoice.com/forums/257854-microsoft-edge-developer/suggestions/8471413-implement-conic-gradients-from-css-image-values-le">Microsoft Edge Uservoice thread</a></li>
+        <li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1175965">Gecko bug report</a></li>
         <li>Chromium bug report (TBD)</li>
-        <li>WebKit bug report (TBD)</li>
+        <li><a href="https://bugs.webkit.org/show_bug.cgi?id=146113">WebKit bug report</a></li>
     </ul>
+
+    <p>But mainly, and regardless of the venue, speak up. Make noise. It matters more than you think.</p>
 </section>
 <a href="https://github.com/leaverou/conic-gradient"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 

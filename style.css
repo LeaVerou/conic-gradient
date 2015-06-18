@@ -10,12 +10,18 @@ body {
 h1 {
 	font: bold 200% Helvetica Neue, sans-serif;
 	color: #aaa;
+	letter-spacing: -.03em;
 }
 
 header > h1 {
 	text-align: center;
-	font-size: 300%;
+	font-size: 180%;
 	color: #f06;
+}
+
+header {
+
+	font-size: 200%;
 }
 
 a {
@@ -68,4 +74,10 @@ textarea {
 
 footer {
 	text-align: center;
+}
+
+#twitter-widget-1 {
+	position: absolute !important;
+	top: 1em;
+	left: 1em;
 }
