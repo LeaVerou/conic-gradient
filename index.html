@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>CSS conic-gradient() polyfill</title>
+<link href="style.css" rel="stylesheet" />
+</head>
+<body>
+
+<header>
+<h1>CSS conic-gradient() polyfill</h1>
+<p><a href="http://w3.org/TR/css4-images/#conic-gradients">Conic gradients</a> are awesome. However, browser vendors haven’t realized yet. This polyfill lets you experiment with them, before they are implemented. If you like them, <a href="#ask">ask browser vendors to implement them</a>.</p>
+</header>
+
+<section id="examples">
+    <h1>Editable Examples</h1>
+
+    <article style="/* Basic two color gradient */
+background-image: conic-gradient(red, hsl(60, 100%, 50%));"></article>
+    <article style="/* Conical gradient cone */
+background: conic-gradient(#eee .1turn, black, #eee 326deg);"></article>
+    <article style="/* Hue wheel */
+background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+border-radius: 50%"></article>
+    <article style="/* Pie chart */
+background: conic-gradient(yellowgreen 40%, gold 0 70%, #f06 0);
+border-radius: 50%"></article>
+    <article style="/* Checkerboard */
+background: conic-gradient(black 25%, white 0 50%, black 0 75%, white 0);
+background-size: 4em 4em;"></article>
+    <article style="/* Alpha and multiple backgrounds */
+background: 
+    conic-gradient(#f06, rgba(0,0,0,.5)),
+    conic-gradient(silver 25%, #eee 0 50%,
+                   silver 0 75%, #eee 0);
+background-size: auto, 1em 1em;"></article>
+        <article style="/* Starburst with repeating gradients */
+background: #0ac
+repeating-conic-gradient(hsla(0,0%,100%,.2) 0 15deg, hsla(0,0%,100%,0) 0 30deg);"></article>
+        <article style="background: #0ac
+repeating-conic-gradient(black 0 80deg, white 0 160deg);"></article>
+</section>
+
+<section>
+    <h1>Features</h1>
+
+    <ul>
+        <li>Color stop normalization</li>
+        <li>Both <code>conic-gradient()</code> and <code>repeating-conic-gradient()</code> support</li>
+        <li>Follows background-size (pixels and percentages). By default occupies the entire element, just like a proper CSS gradient.</li>
+        <li>Supports double position syntax (two positions for the same color stop, as a shortcut for two consecutive color stops with the same color)</li>
+    </ul>
+</section>
+
+<section>
+    <h1>Limitations</h1>
+
+    <ul>
+        <li>No center point support</li>
+        <li>No calc() support</li>
+        <li>No midpoint color stops (color stops with no color)</li>
+        <li>Negative color stop positions not supported</li>
+        <li>Color interpolation happens without premultiplied alpha.</li>
+    </ul>
+</section>
+
+<section id="usage">
+    <h1>Usage</h1>
+
+    <p>To use directly in your CSS code like you would if it was supported, it requires <a href="http://leaverou.github.io/prefixfree">-prefix-free</a>. Just include both scripts in order:</p>
+    <pre><code class="language-markup">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/prefixfree/1.0.7/prefixfree.min.js">&lt;/script>
+&lt;script src="conic-gradient.js">&lt;/script></code></pre>
+
+    <p>Alternatively, you can use the API to directly get the SVG element generated and do whatever you want with it:</p>
+    <pre><code class="language-javascript">var gradient = new ConicGradient("gold 40%, #f06 0");
+console.log(gradient.svg);
+console.log(gradient.dataURL);
+console.log(gradient.blobURL);</code></pre>
+
+    <p>Optionally, you can pass in a parameter for size of the bitmap image generated inside the SVG (defaults to <code>Math.max(innerWidth, innerHeight)</code>, i.e. the max of the viewport dimensions):</p>
+    <pre><code class="language-javascript">var gradient = new ConicGradient("gold 40%, #f06 0", 400);</code></pre>
+</section>
+
+<section id="ask">
+    <h1>How can I get conic gradients implemented?</h1>
+
+    <p>The best way to get a feature implemented is asking browser vendors to do it. It’s really that simple. Browser vendors prioritize what to implement based on developer requests, so the more developers asking for a feature, the higher the chances browsers will notice.</p>
+
+    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Conic gradients are awesome. Please implement them @IEDevChat @mozhacks @ChromiumDev @odevrel @webkit" data-via="LeaVerou">Tweet</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    
+    <p>Also, communicate directly with the developers. Vote or comment etc in the following:</p>
+
+    <ul>
+        <li>Microsoft Edge Uservoice thread (TBD)</li>
+        <li>Gecko bug report (TBD)</li>
+        <li>Chromium bug report (TBD)</li>
+        <li>WebKit bug report (TBD)</li>
+    </ul>
+</section>
+
+<footer>
+    Made with &hearts; by <a href="http://lea.verou.me">Lea Verou</a>
+</footer>
+
+<script src="../prefixfree/prefixfree.min.js"></script>
+<script src="../incrementable/incrementable.js"></script>
+<script src="conic-gradient.js"></script>
+<script src="index.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,66 @@
+body {
+    margin: 0 auto;
+    max-width: 60em;
+    padding: 2em;
+    background-color: #fff;
+    background: white;
+}
+
+h1 {
+	font: bold 200% Helvetica Neue, sans-serif;
+	color: #aaa;
+}
+
+header > h1 {
+	text-align: center;
+	font-size: 300%;
+	color: #f06;
+}
+
+a {
+	color: #0ac;
+	font-weight: bold;
+}
+
+a:not(:hover) {
+	text-decoration: none;
+}
+
+textarea {
+	font: inherit;
+	font-family: Consolas, Monaco, monospace;
+}
+
+#examples {}
+
+	#examples article {
+		display: flex;
+		margin: 2em 0;
+		resize: vertical;
+	}
+
+	#examples textarea {
+		flex: 1;
+		padding: .5em .8em;
+		border: 0;
+		margin-left: .5em;
+		background: hsl(200, 20%, 25%) linear-gradient(rgba(0,0,0,.1) 50%, transparent 0);
+		background-origin: content-box;
+		background-size: auto 3em;
+		background-attachment: local;
+		color: white;
+		font-size: 120%;
+		line-height: 1.5;
+	}
+
+	#examples div {
+	    width: 300px;
+	    height: 300px;
+	    display: inline-block;
+	    background-size: 100% 100%;
+	    background-position: center;
+	}
+
+footer {
+	text-align: center;
+}
