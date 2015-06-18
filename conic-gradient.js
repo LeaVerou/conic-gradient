@@ -199,7 +199,7 @@ _.prototype = {
 			// 0.02: To prevent moire
 			
 			var arc = endAngle - angle;
-			c.arc(x, x, radius, arc >= 90*deg? angle : angle - 0.02, endAngle); 
+			c.arc(x, x, radius, arc >= 2*deg? angle : angle - 0.02, endAngle); 
 
 			c.closePath();
 			c.fill();
