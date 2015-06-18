@@ -8,6 +8,7 @@
 
 var π = Math.PI;
 var τ = 2 * π;
+var ε = .00001;
 var deg = π/180;
 
 var dummy = document.createElement("div");
@@ -147,25 +148,24 @@ _.prototype = {
 		c.translate(-this.size/2, -this.size/2);
 
 		for (var i = 0; i < 360; i+=.5) {
-			if (i/360 >= stop.pos) {
+			if (i/360 + ε >= stop.pos) {
 				// Switch color stop
 				do {
 					prevStop = stop;
 
 					stopIndex++;
 					stop = this.stops[stopIndex];
-				} while(stop != prevStop && stop.pos === prevStop.pos);
+				} while(stop && stop != prevStop && stop.pos === prevStop.pos);
 
 				if (!stop) {
 					break;
 				}
 
-				var sameColor = prevStop.color + "" === stop.color + "";
+				var sameColor = prevStop.color + "" === stop.color + "" && prevStop != stop;
 
 				diff = prevStop.color.map(function(c, i){
 					return stop.color[i] - c;
 				});
-
 			}
 			
 			t = (i/360 - prevStop.pos) / (stop.pos - prevStop.pos);
@@ -284,8 +284,7 @@ if (self.StyleFix) {
 					css = css.replace(/(?:repeating-)?conic-gradient\(((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
 						return new ConicGradient({
 							stops: stops, 
-							repeating: gradient.indexOf("repeating-") > -1,
-							size: 400
+							repeating: gradient.indexOf("repeating-") > -1
 						});
 					});
 				}
