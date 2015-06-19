@@ -81,3 +81,17 @@ footer {
 	top: 1em;
 	left: 1em;
 }
+
+#community {
+	column-count: 2;
+}
+
+	#community > :not(.twitter-tweet) {
+		column-span: all;
+	}
+
+	#community .twitter-tweet {
+		margin: 0 0 1em !important;
+		-webkit-column-break-inside: avoid;
+		break-inside: avoid;
+	}
