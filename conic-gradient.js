@@ -143,6 +143,7 @@ _.prototype = {
 		
 		var diff, t;
 
+		// Transform coordinate system so that angles start from the top left, like in CSS
 		c.translate(this.size/2, this.size/2);
 		c.rotate(-90*deg);
 		c.translate(-this.size/2, -this.size/2);
@@ -197,9 +198,8 @@ _.prototype = {
 			endAngle = Math.min(360*deg, endAngle);
 
 			// 0.02: To prevent moire
-			
 			var arc = endAngle - angle;
-			c.arc(x, x, radius, arc >= 2*deg? angle : angle - 0.02, endAngle); 
+			c.arc(x, x, radius, arc >= 2*deg? angle : angle - .02, endAngle); 
 
 			c.closePath();
 			c.fill();
