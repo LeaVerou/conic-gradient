@@ -281,7 +281,7 @@ if (self.StyleFix) {
 			// Not supported, use polyfill
 			StyleFix.register(function(css, raw) {
 				if (css.indexOf("conic-gradient") > -1) {
-					css = css.replace(/(?:repeating-)?conic-gradient\(((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
+					css = css.replace(/(?:repeating-)?conic-gradient\(\s*((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
 						return new ConicGradient({
 							stops: stops, 
 							repeating: gradient.indexOf("repeating-") > -1
