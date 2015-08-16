@@ -33,6 +33,11 @@ var _ = self.ConicGradient = function(o) {
 
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
+	if(/^at\s[^,]/.test(this.stops[0])) {
+		pos_stop = this.stops.shift();
+		console.log("The background-position property is not supported right now.");
+	}
+
 	for (var i=0; i<this.stops.length; i++) {
 		var stop = this.stops[i] = new _.ColorStop(this, this.stops[i]);
 

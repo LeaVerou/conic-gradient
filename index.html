@@ -115,6 +115,8 @@ console.log(gradient.blobURL); // blog URL</code></pre>
     <p>Note that the generated image will always resize accordingly, you don’t have to provide a size. The size argument just controls the resolution of the bitmap image generated inside the SVG that will be scaled. Making it smaller will result in faster performance but less crisp gradients.</p>
 
     <p>Also, you can use <a href="https://github.com/jonathantneal/postcss-conic-gradient">PostCSS Conic Gradient</a> to have conic gradient fallbacks added automatically to your CSS file.</p>
+
+    <p>Note that the background-position property, such as <code>at center</code> etc, is not supported right now, and is ignored if present.</p>
 </section>
 
 <section id="ask">
