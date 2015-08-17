@@ -34,8 +34,8 @@ var _ = self.ConicGradient = function(o) {
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
 	if(/^at\s[^,]/.test(this.stops[0])) {
-		pos_stop = this.stops.shift();
-		console.log("The gradient-center position property is not supported right now.");
+		var center_string = this.stops.shift();
+		this.center = _.GradientCenter(this, center_string);
 	}
 
 	for (var i=0; i<this.stops.length; i++) {
@@ -141,17 +141,13 @@ _.prototype = {
 		var c = this.context;
 		
 		var radius = this.r;
-		var x = this.size / 2;
-		
+		var x = this.center != null ? this.center.x : this.size / 2;
+		var y = this.center != null ? this.center.y : x;
+
 		var stopIndex = 0; // The index of the current color
 		var stop = this.stops[stopIndex], prevStop;
 		
 		var diff, t;
-
-		// Transform coordinate system so that angles start from the top left, like in CSS
-		c.translate(this.size/2, this.size/2);
-		c.rotate(-90*deg);
-		c.translate(-this.size/2, -this.size/2);
 
 		for (var i = 0; i < 360; i+=.5) {
 			if (i/360 + ε >= stop.pos) {
@@ -185,9 +181,9 @@ _.prototype = {
 			// Draw a series of arcs, 1deg each
 			c.fillStyle = 'rgba(' + interpolated.join(",") + ')';
 			c.beginPath();
-			c.moveTo(x, x);
+			c.moveTo(x, y);
 			
-			var angle = Math.min(360*deg, i*deg);
+			var angle = Math.min((360 - 90) * deg, (i - 90) *deg);
 
 			if (sameColor) {
 				var θ = 360 * (stop.pos - prevStop.pos);
@@ -204,7 +200,7 @@ _.prototype = {
 
 			// 0.02: To prevent moire
 			var arc = endAngle - angle;
-			c.arc(x, x, radius, arc >= 2*deg? angle : angle - .02, endAngle); 
+			c.arc(x, y, radius, arc >= 2*deg? angle : angle - .02, endAngle); 
 
 			c.closePath();
 			c.fill();
@@ -271,6 +267,50 @@ _.ColorStop.colorToRGBA = function(color) {
 	}
 
 	return color;
+};
+
+_.GradientCenter = function(gradient, position) {
+	canvas = gradient.canvas;
+	var flipped = false
+		, temp = null
+		, parts = position.match(/^at\s+(.+?)(?:\s+(.+?))?$/);
+
+	if (parts[2] == null) {
+		parts[2] = 'center';
+	}
+	var flipped = /^at\s+(?:top|bottom)\s+(?:right|left|center)$/.test(position);
+	if (flipped) {
+		temp = parts[1];
+		parts[1] = parts[2];
+		parts[2] = temp;
+	}
+
+	return {
+		x: _.GradientCenter.stringToPosition(parts[1], canvas.width),
+		y: _.GradientCenter.stringToPosition(parts[2], canvas.height)
+	};
+};
+
+_.GradientCenter.stringToPosition = function(position, dimension) {
+	var parts = position.match(/^(?:(center|top|bottom|right|left|([\d.]+)(%|px)?))$/)
+	var pos = 0;
+	if (parts[1]) {
+		if (parts[1] == 'top' || parts[1] == 'left') {
+			pos = 0;
+		} else if (parts[1] == 'bottom' || parts[1] == 'right') {
+			pos = dimension;
+		} else if (parts[1] == 'center') {
+			pos = dimension/2;
+		} else {
+			var unit = parts[3];
+			if (unit == 'px' || parts[2] === "0" && !unit) {
+				pos = parts[2];
+			} else if (unit == '%') {
+				pos = parts[2] * dimension / 100;
+			}
+		}
+	}
+	return pos;
 };
 
 })();
