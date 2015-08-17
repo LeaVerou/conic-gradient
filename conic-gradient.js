@@ -35,7 +35,7 @@ var _ = self.ConicGradient = function(o) {
 
 	if(/^at\s[^,]/.test(this.stops[0])) {
 		pos_stop = this.stops.shift();
-		console.log("The background-position property is not supported right now.");
+		console.log("The gradient-center position property is not supported right now.");
 	}
 
 	for (var i=0; i<this.stops.length; i++) {
