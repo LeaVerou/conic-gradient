@@ -33,6 +33,8 @@ var _ = self.ConicGradient = function(o) {
 
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
+	// If the center position is specified, calculate the center,
+	// and remove it from the list of stops
 	if(/^at\s[^,]/.test(this.stops[0])) {
 		var center_string = this.stops.shift();
 		this.center = _.GradientCenter(this, center_string);
@@ -48,7 +50,7 @@ var _ = self.ConicGradient = function(o) {
 	}
 
 	// Normalize stops
-	
+
 	// Add dummy first stop or set first stop’s position to 0 if it doesn’t have one
 	if (this.stops[0].pos === undefined) {
 			this.stops[0].pos = 0;
@@ -58,7 +60,7 @@ var _ = self.ConicGradient = function(o) {
 		first.pos = 0;
 		this.stops.unshift(first);
 	}
-	
+
 	// Add dummy last stop or set first stop’s position to 100% if it doesn’t have one
 	if (this.stops[this.stops.length - 1].pos === undefined) {
 		this.stops[this.stops.length - 1].pos = 1;
@@ -68,7 +70,7 @@ var _ = self.ConicGradient = function(o) {
 		last.pos = 1;
 		this.stops.push(last);
 	}
-	
+
 	this.stops.forEach(function(stop, i){
 		if (stop.pos === undefined) {
 			// Evenly space color stops with no position
@@ -95,7 +97,7 @@ var _ = self.ConicGradient = function(o) {
 			for (var j=0; j<stops.length; j++) {
 				var s = stops[j].clone();
 				s.pos += (i+1)*difference;
-				
+
 				this.stops.push(s);
 			}
 		}
@@ -122,7 +124,7 @@ _.prototype = {
 	},
 
 	get svg() {
-		return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">' + 
+		return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">' +
 			'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">' +
 			'<image width="100" height="100%" xlink:href="' + this.png + '" /></svg></svg>';
 	},
@@ -134,19 +136,21 @@ _.prototype = {
 	get r() {
 		return Math.sqrt(2) * this.size / 2;
 	},
-	
+
 	// Paint the conical gradient on the canvas
 	// Algorithm inspired from http://jsdo.it/akm2/yr9B
 	paint: function() {
 		var c = this.context;
-		
+
 		var radius = this.r;
+		// if the gradient center is specified, take the center co-ords from that,
+		// otherwise default to 'center center' (50% 50%).
 		var x = this.center != null ? this.center.x : this.size / 2;
 		var y = this.center != null ? this.center.y : x;
 
 		var stopIndex = 0; // The index of the current color
 		var stop = this.stops[stopIndex], prevStop;
-		
+
 		var diff, t;
 
 		for (var i = 0; i < 360; i+=.5) {
@@ -169,7 +173,7 @@ _.prototype = {
 					return stop.color[i] - c;
 				});
 			}
-			
+
 			t = (i/360 - prevStop.pos) / (stop.pos - prevStop.pos);
 
 			var interpolated = sameColor? stop.color : diff.map(function(d,i){
@@ -182,7 +186,9 @@ _.prototype = {
 			c.fillStyle = 'rgba(' + interpolated.join(",") + ')';
 			c.beginPath();
 			c.moveTo(x, y);
-			
+
+			// In canvas, the 0deg lies on the 90deg of the CSS coordinate system,
+			// so transform the angles by that amount.
 			var angle = Math.min((360 - 90) * deg, (i - 90) *deg);
 
 			if (sameColor) {
@@ -193,18 +199,18 @@ _.prototype = {
 			else {
 				var θ = .5;
 			}
-			
+
 			var endAngle = angle + θ*deg;
 
 			endAngle = Math.min(360*deg, endAngle);
 
 			// 0.02: To prevent moire
 			var arc = endAngle - angle;
-			c.arc(x, y, radius, arc >= 2*deg? angle : angle - .02, endAngle); 
+			c.arc(x, y, radius, arc >= 2*deg? angle : angle - .02, endAngle);
 
 			c.closePath();
 			c.fill();
-		
+
 		}
 	}
 };
@@ -269,6 +275,24 @@ _.ColorStop.colorToRGBA = function(color) {
 	return color;
 };
 
+// Get the center of the gradient from a given position string.
+//
+// * The position string is of this type: at pos1 pos2
+// * If pos1 and pos2 are specified as numbers or [number <css_length>] (such as 5px, 30%)
+//   then `pos1` is the position along the x-axis, and `pos-2` is along y-axis
+// * If pos1 AND pos2 are one of `top|left|right|bottom`, they
+//   are also understood, regardless of the order in which they come.
+//   Therefore, top left === left top
+// * If a parameter is not specified, it is taken as `center`.
+//
+// So, these are all valid parameters:
+// at 20px 80% -> 20px from top, 80% from left
+// at center -> 50%, 50%
+// at top left -> 0%, 0%
+// at right -> 100%, 50%
+// at bottom -> 50%, 100%
+//
+// * Other css length units such as `em` and `rem` are not supported yet.
 _.GradientCenter = function(gradient, position) {
 	canvas = gradient.canvas;
 	var flipped = false
@@ -278,6 +302,7 @@ _.GradientCenter = function(gradient, position) {
 	if (parts[2] == null) {
 		parts[2] = 'center';
 	}
+
 	var flipped = /^at\s+(?:top|bottom)\s+(?:right|left|center)$/.test(position);
 	if (flipped) {
 		temp = parts[1];
@@ -291,6 +316,8 @@ _.GradientCenter = function(gradient, position) {
 	};
 };
 
+// Get the position in CSS pixels from a given position string (like 5px, 30%, top, right, center)
+// For CSS length values, this works only with `px` and `%` right now.
 _.GradientCenter.stringToPosition = function(position, dimension) {
 	var parts = position.match(/^(?:(center|top|bottom|right|left|([\d.]+)(%|px)?))$/)
 	var pos = 0;
@@ -328,7 +355,7 @@ if (self.StyleFix) {
 				if (css.indexOf("conic-gradient") > -1) {
 					css = css.replace(/(?:repeating-)?conic-gradient\(\s*((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
 						return new ConicGradient({
-							stops: stops, 
+							stops: stops,
 							repeating: gradient.indexOf("repeating-") > -1
 						});
 					});
