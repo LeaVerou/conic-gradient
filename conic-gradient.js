@@ -134,7 +134,7 @@ _.prototype = {
 	},
 
 	get r() {
-		return Math.sqrt(2) * this.size / 2;
+		return Math.sqrt(2) * this.size;
 	},
 
 	// Paint the conical gradient on the canvas
