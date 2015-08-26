@@ -302,8 +302,7 @@ _.GradientCenter = function(gradient, position) {
 	if (parts[2] == null) {
 		parts[2] = 'center';
 	}
-
-	var flipped = /^at\s+(?:top|bottom)\s+(?:right|left|center)$/.test(position);
+	var flipped = /^at\s+(?:top|bottom)(?:\s+)?(?:right|left|center)?$/.test(position);
 	if (flipped) {
 		temp = parts[1];
 		parts[1] = parts[2];
