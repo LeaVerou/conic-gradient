@@ -76,12 +76,6 @@ footer {
 	text-align: center;
 }
 
-#twitter-widget-1 {
-	position: absolute !important;
-	top: 1em;
-	left: 1em;
-}
-
 #community {
 	column-count: 2;
 }
