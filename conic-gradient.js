@@ -34,11 +34,17 @@ var _ = self.ConicGradient = function(o) {
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
 	for (var i=0; i<this.stops.length; i++) {
-		var stop = this.stops[i] = new _.ColorStop(this, this.stops[i]);
+		if (this.stops[i]) {
+			var stop = this.stops[i] = new _.ColorStop(this, this.stops[i]);
 
-		if (stop.next) {
-			this.stops.splice(i+1, 0, stop.next);
-			i++;
+			if (stop.next) {
+				this.stops.splice(i+1, 0, stop.next);
+				i++;
+			}
+		}
+		else {
+			this.stops.splice(i, 1);
+			i--;
 		}
 	}
 
