@@ -49,7 +49,7 @@ var _ = self.ConicGradient = function(o) {
 	}
 
 	// Normalize stops
-	
+
 	// Add dummy first stop or set first stop’s position to 0 if it doesn’t have one
 	if (this.stops[0].pos === undefined) {
 			this.stops[0].pos = 0;
@@ -59,7 +59,7 @@ var _ = self.ConicGradient = function(o) {
 		first.pos = 0;
 		this.stops.unshift(first);
 	}
-	
+
 	// Add dummy last stop or set first stop’s position to 100% if it doesn’t have one
 	if (this.stops[this.stops.length - 1].pos === undefined) {
 		this.stops[this.stops.length - 1].pos = 1;
@@ -69,7 +69,7 @@ var _ = self.ConicGradient = function(o) {
 		last.pos = 1;
 		this.stops.push(last);
 	}
-	
+
 	this.stops.forEach(function(stop, i){
 		if (stop.pos === undefined) {
 			// Evenly space color stops with no position
@@ -96,7 +96,7 @@ var _ = self.ConicGradient = function(o) {
 			for (var j=0; j<stops.length; j++) {
 				var s = stops[j].clone();
 				s.pos += (i+1)*difference;
-				
+
 				this.stops.push(s);
 			}
 		}
@@ -123,7 +123,7 @@ _.prototype = {
 	},
 
 	get svg() {
-		return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">' + 
+		return '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">' +
 			'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">' +
 			'<image width="100" height="100%" xlink:href="' + this.png + '" /></svg></svg>';
 	},
@@ -135,18 +135,18 @@ _.prototype = {
 	get r() {
 		return Math.sqrt(2) * this.size / 2;
 	},
-	
+
 	// Paint the conical gradient on the canvas
 	// Algorithm inspired from http://jsdo.it/akm2/yr9B
 	paint: function() {
 		var c = this.context;
-		
+
 		var radius = this.r;
 		var x = this.size / 2;
-		
+
 		var stopIndex = 0; // The index of the current color
 		var stop = this.stops[stopIndex], prevStop;
-		
+
 		var diff, t;
 
 		// Transform coordinate system so that angles start from the top left, like in CSS
@@ -174,7 +174,7 @@ _.prototype = {
 					return stop.color[i] - c;
 				});
 			}
-			
+
 			t = (i/360 - prevStop.pos) / (stop.pos - prevStop.pos);
 
 			var interpolated = sameColor? stop.color : diff.map(function(d,i){
@@ -187,7 +187,7 @@ _.prototype = {
 			c.fillStyle = 'rgba(' + interpolated.join(",") + ')';
 			c.beginPath();
 			c.moveTo(x, x);
-			
+
 			var angle = Math.min(360*deg, i*deg);
 
 			if (sameColor) {
@@ -198,18 +198,18 @@ _.prototype = {
 			else {
 				var θ = .5;
 			}
-			
+
 			var endAngle = angle + θ*deg;
 
 			endAngle = Math.min(360*deg, endAngle);
 
 			// 0.02: To prevent moire
 			var arc = endAngle - angle;
-			c.arc(x, x, radius, arc >= 2*deg? angle : angle - .02, endAngle); 
+			c.arc(x, x, radius, arc >= 2*deg? angle : angle - .02, endAngle);
 
 			c.closePath();
 			c.fill();
-		
+
 		}
 	}
 };
@@ -289,7 +289,7 @@ if (self.StyleFix) {
 				if (css.indexOf("conic-gradient") > -1) {
 					css = css.replace(/(?:repeating-)?conic-gradient\(\s*((?:\([^()]+\)|[^;()}])+?)\)/g, function(gradient, stops) {
 						return new ConicGradient({
-							stops: stops, 
+							stops: stops,
 							repeating: gradient.indexOf("repeating-") > -1
 						});
 					});
