@@ -154,7 +154,7 @@ _.prototype = {
 		c.rotate(-90*deg);
 		c.translate(-this.size/2, -this.size/2);
 
-		for (var i = 0; i < 360; i+=.5) {
+		for (var i = 0; i < 360;) {
 			if (i/360 + ε >= stop.pos) {
 				// Switch color stop
 				do {
@@ -188,28 +188,27 @@ _.prototype = {
 			c.beginPath();
 			c.moveTo(x, x);
 
-			var angle = Math.min(360*deg, i*deg);
-
 			if (sameColor) {
 				var θ = 360 * (stop.pos - prevStop.pos);
-
-				i += θ - .5;
 			}
 			else {
 				var θ = .5;
 			}
 
-			var endAngle = angle + θ*deg;
+			var beginArg = i*deg;
+			beginArg = Math.min(360*deg, beginArg);
 
-			endAngle = Math.min(360*deg, endAngle);
+			// .02: To prevent empty blank line and corresponding moire
+			// only non-alpha colors are cared now
+			var endArg = beginArg + θ*deg;
+			endArg = Math.min(360*deg, endArg + .02);
 
-			// 0.02: To prevent moire
-			var arc = endAngle - angle;
-			c.arc(x, x, radius, arc >= 2*deg? angle : angle - .02, endAngle);
+			c.arc(x, x, radius, beginArg, endArg);
 
 			c.closePath();
 			c.fill();
 
+			i += θ;
 		}
 	}
 };
