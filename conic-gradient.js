@@ -113,7 +113,10 @@ _.prototype = {
 	},
 
 	get dataURL() {
-		return "data:image/svg+xml," + this.svg;
+		// IE/Edge only render data-URI based background-image when the image data
+		// is escaped.
+		// Ref: https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/7157459/#comment-3
+		return "data:image/svg+xml," + encodeURIComponent(this.svg);
 	},
 
 	get blobURL() {
