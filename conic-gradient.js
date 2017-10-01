@@ -33,6 +33,8 @@ var _ = self.ConicGradient = function(o) {
 
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
+	this.from = 0;
+
 	for (var i=0; i<this.stops.length; i++) {
 		if (this.stops[i]) {
 			var stop = this.stops[i] = new _.ColorStop(this, this.stops[i]);
@@ -48,6 +50,10 @@ var _ = self.ConicGradient = function(o) {
 		}
 	}
 
+	if (this.stops[0].color.indexOf('from') == 0) {
+		this.from = this.stops[0].pos*360;
+		this.stops.shift();
+	}
 	// Normalize stops
 
 	// Add dummy first stop or set first stop’s position to 0 if it doesn’t have one
@@ -155,6 +161,7 @@ _.prototype = {
 		// Transform coordinate system so that angles start from the top left, like in CSS
 		c.translate(this.size/2, this.size/2);
 		c.rotate(-90*deg);
+		c.rotate(this.from*deg);
 		c.translate(-this.size/2, -this.size/2);
 
 		for (var i = 0; i < 360;) {
@@ -220,7 +227,7 @@ _.ColorStop = function(gradient, stop) {
 	this.gradient = gradient;
 
 	if (stop) {
-		var parts = stop.match(/^(.+?)(?:\s+([\d.]+)(%|deg|turn)?)?(?:\s+([\d.]+)(%|deg|turn)?)?\s*$/);
+		var parts = stop.match(/^(.+?)(?:\s+([\d.]+)(%|deg|turn|grad|rad)?)?(?:\s+([\d.]+)(%|deg|turn|grad|rad)?)?\s*$/);
 
 		this.color = _.ColorStop.colorToRGBA(parts[1]);
 
@@ -235,6 +242,12 @@ _.ColorStop = function(gradient, stop) {
 			}
 			else if (unit == "deg") {
 				this.pos  = parts[2] / 360;
+			}
+			else if (unit == "grad") {
+				this.pos  = parts[2] / 400;
+			}
+			else if (unit == "rad") {
+				this.pos  = parts[2] / τ;
 			}
 		}
 
@@ -259,7 +272,7 @@ _.ColorStop.prototype = {
 };
 
 _.ColorStop.colorToRGBA = function(color) {
-	if (!Array.isArray(color)) {
+	if (!Array.isArray(color) && color.indexOf("from") == -1) {
 		dummy.style.color = color;
 
 		var rgba = getComputedStyle(dummy).color.match(/rgba?\(([\d.]+), ([\d.]+), ([\d.]+)(?:, ([\d.]+))?\)/);
