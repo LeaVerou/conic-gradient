@@ -1,0 +1,25 @@
+{
+  "name": "conic-gradient",
+  "version": "1.0.0",
+  "description": "Conic Gradient Polyfill",
+  "main": "conic-gradient.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeaVerou/conic-gradient.git"
+  },
+  "keywords": [
+    "css"
+  ],
+  "author": "Lea Verou",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LeaVerou/conic-gradient/issues"
+  },
+  "homepage": "https://github.com/LeaVerou/conic-gradient#readme",
+  "dependencies": {
+      "prefixfree": "^1.0.0"
+  }
+}
