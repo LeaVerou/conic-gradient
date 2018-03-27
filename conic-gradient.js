@@ -173,7 +173,7 @@ _.prototype = {
 					stopIndex++;
 					stop = this.stops[stopIndex];
 				// Consider position being the same if in differs no more than by ε
-				} while(stop && stop != prevStop && Math.abs(stop.pos - prevStop.pos) < ε);
+				} while(stop && stop != prevStop && i/360 + ε >= stop.pos);
 
 				if (!stop) {
 					break;
