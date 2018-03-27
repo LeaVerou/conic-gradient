@@ -172,7 +172,7 @@ _.prototype = {
 
 					stopIndex++;
 					stop = this.stops[stopIndex];
-				// Consider position being the same if in differs no more than by ε
+				// Continue while point is behind current position (i)
 				} while(stop && stop != prevStop && i/360 + ε >= stop.pos);
 
 				if (!stop) {
