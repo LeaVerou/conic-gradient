@@ -66,7 +66,7 @@ var _ = self.ConicGradient = function(o) {
 		this.stops.unshift(first);
 	}
 
-	// Add dummy last stop or set first stop’s position to 100% if it doesn’t have one
+	// Add dummy last stop or set last stop’s position to 100% if it doesn’t have one
 	if (this.stops[this.stops.length - 1].pos === undefined) {
 		this.stops[this.stops.length - 1].pos = 1;
 	}
@@ -172,7 +172,8 @@ _.prototype = {
 
 					stopIndex++;
 					stop = this.stops[stopIndex];
-				} while(stop && stop != prevStop && stop.pos === prevStop.pos);
+				// Consider position being the same if in differs no more than by ε
+				} while(stop && stop != prevStop && Math.abs(stop.pos - prevStop.pos) < ε);
 
 				if (!stop) {
 					break;
