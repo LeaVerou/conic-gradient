@@ -146,80 +146,53 @@ _.prototype = {
 	},
 
 	// Paint the conical gradient on the canvas
-	// Algorithm inspired from http://jsdo.it/akm2/yr9B
 	paint: function() {
 		var c = this.context;
 
 		var radius = this.r;
-		var x = this.size / 2;
+		var half = this.size / 2;
+		var x = half;
+		var scale = this.stops[this.stops.length - 1].pos;
 
-		var stopIndex = 0; // The index of the current color
-		var stop = this.stops[stopIndex], prevStop;
-
-		var diff, t;
+		var tinycanvas = document.createElement("canvas");
+		tinycanvas.width = 360*scale;
+		var tinyctx = tinycanvas.getContext("2d");
+		var tinygradient = tinyctx.createLinearGradient(0,0,360*scale,0);
+		this.stops.forEach(function(stop){
+			tinygradient.addColorStop(stop.pos/scale, 'rgba(' + stop.color.join(",") + ')');
+		});
+		tinyctx.fillStyle = tinygradient;
+		tinyctx.fillRect(0,0,360,1);
 
 		// Transform coordinate system so that angles start from the top left, like in CSS
-		c.translate(this.size/2, this.size/2);
+		c.translate(half, half);
 		c.rotate(-90*deg);
 		c.rotate(this.from*deg);
-		c.translate(-this.size/2, -this.size/2);
+		c.translate(-half, -half);
 
-		for (var i = 0; i < 360;) {
-			if (i/360 + ε >= stop.pos) {
-				// Switch color stop
-				do {
-					prevStop = stop;
+		// Draw a series of arcs, 1deg each
+		for (var i = 0; i < 360; i++) {
 
-					stopIndex++;
-					stop = this.stops[stopIndex];
-				// Continue while point is behind current position (i)
-				} while(stop && stop != prevStop && i/360 + ε >= stop.pos);
+			var data = tinyctx.getImageData(i, 0, 1, 1).data;
 
-				if (!stop) {
-					break;
-				}
-
-				var sameColor = prevStop.color + "" === stop.color + "" && prevStop != stop;
-
-				diff = prevStop.color.map(function(c, i){
-					return stop.color[i] - c;
-				});
-			}
-
-			t = (i/360 - prevStop.pos) / (stop.pos - prevStop.pos);
-
-			var interpolated = sameColor? stop.color : diff.map(function(d,i){
-				var ret = d * t + prevStop.color[i];
-
-				return i < 3? ret & 255 : ret;
-			});
-
-			// Draw a series of arcs, 1deg each
-			c.fillStyle = 'rgba(' + interpolated.join(",") + ')';
+			c.fillStyle = 'rgba(' + data[0] + ', ' + data[1] +
+             ', ' + data[2] + ', ' + (data[3] / 255) + ')';
 			c.beginPath();
 			c.moveTo(x, x);
-
-			if (sameColor) {
-				var θ = 360 * (stop.pos - prevStop.pos);
-			}
-			else {
-				var θ = .5;
-			}
 
 			var beginArg = i*deg;
 			beginArg = Math.min(360*deg, beginArg);
 
 			// .02: To prevent empty blank line and corresponding moire
 			// only non-alpha colors are cared now
-			var endArg = beginArg + θ*deg;
-			endArg = Math.min(360*deg, endArg + .02);
+			var endArg = (i+1)*deg + ( data[3] < 255 ? 0 : 0.02);
+			endArg = Math.min(360*deg, endArg);
 
 			c.arc(x, x, radius, beginArg, endArg);
 
 			c.closePath();
 			c.fill();
 
-			i += θ;
 		}
 	}
 };
