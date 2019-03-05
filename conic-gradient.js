@@ -33,7 +33,7 @@ var _ = self.ConicGradient = function(o) {
 
 	this.stops = (stops || "").split(/\s*,(?![^(]*\))\s*/); // commas that are not followed by a ) without a ( first
 
-	this.from = o.from;
+	this.from = o.from || 0;
 
 	for (var i=0; i<this.stops.length; i++) {
 		if (this.stops[i]) {
