@@ -12,7 +12,7 @@ var ε = .00001;
 var deg = π/180;
 
 var dummy = document.createElement("div");
-document.head.appendChild(dummy);
+document.body.appendChild(dummy);
 
 var _ = self.ConicGradient = function(o) {
 	var me = this;
