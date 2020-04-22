@@ -14,8 +14,10 @@
 
 <section id="examples">
     <h1>Editable Examples</h1>
-          <article id="basic" style="/* Basic example */
+     <article id="basic" style="/* Basic example */
 background: conic-gradient(#f06, gold);"></article>
+     <article id="basic" style="/* Start from 25 degrees and use a color stop beyond the end. */
+background: conic-gradient(from 25deg, #a3b, gold .5turn, blue 1.2turn);"></article>
      <article style="/* Conical gradient cone */
 background: conic-gradient(#eee .1turn, black, #eee 326deg);"></article>
    <article style="/* Hue wheel */
@@ -27,15 +29,25 @@ border-radius: 50%"></article>
     <article style="/* Checkerboard */
 background: conic-gradient(black 25%, white 0 50%, black 0 75%, white 0);
 background-size: 4em 4em;"></article>
+    <article style="/* sort of houndstooth */
+background: conic-gradient(from 25deg,black 25%, white 0 50%, black 0 75%, white 0);
+background-size: 4em 5em;"></article>
     <article style="/* Alpha and multiple backgrounds */
 background:
     conic-gradient(#f06, rgba(0,0,0,.5)),
     conic-gradient(silver 25%, #eee 0 50%,
                    silver 0 75%, #eee 0);
 background-size: auto, 1em 1em;"></article>
-        <article style="/* Starburst with repeating gradients */
+    <article style="/* Starburst with repeating gradients */
 background: #0ac
 repeating-conic-gradient(hsla(0,0%,100%,.2) 0 15deg, hsla(0,0%,100%,0) 0 30deg);"></article>
+    <article style="/* Rays */
+background-color: indigo;
+background-image: repeating-conic-gradient(hsla(52,100%,90%, 0.16) 0deg,
+	hsla(52,100%,95%, 0.005) 7deg, hsla(52,100%,90%, 0.15) 11deg);
+background-size: 250% 280%;
+background-repeat: no-repeat;
+background-position: 80% 100%;"></article>
 </section>
 
 <section id="community">
@@ -93,7 +105,7 @@ repeating-conic-gradient(hsla(0,0%,100%,.2) 0 15deg, hsla(0,0%,100%,0) 0 30deg);
         <li>No calc() support</li>
         <li>No midpoint color stops (color stops with no color)</li>
         <li>Negative color stop positions not supported</li>
-        <li>Color interpolation happens without premultiplied alpha.</li>
+        
     </ul>
 </section>
 
